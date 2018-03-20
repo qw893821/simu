@@ -12,6 +12,8 @@ let roombutton;
 const newMat = {}
 let textThickness;
 let textK;
+const record1 = {}
+const record2 = {}
 
 function preload() {
     img = loadImage('./images/sample.jpg');
@@ -25,7 +27,7 @@ function setup() {
     coldMedia = new Media(4186, 0, 0);
     layer1 = new Room(1, 10, 1085, 401);
     timer = 0;
-    countTime = 30;
+    countTime = 10;
     imageMode(CENTER);
     image(img, width / 2, height / 2);
     textThickness = createInput();
@@ -56,11 +58,22 @@ function Calculator() {
         coldMedia.loseHeat(cooler.power);
         heatMedia.updateText();
         coldMedia.updateText();
+        record1.temp1 = heatMedia.temperature;
+        record1.temp2 = coldMedia.temperature;
         layer1.tempSide1 = heatMedia.temperature;
         layer1.tempSide2 = coldMedia.temperature;
-        coldMedia.captureHeat(layer1.innerTransfer());
-        heatMedia.loseHeat(layer1.innerTransfer());
+        //coldMedia.captureHeat(layer1.innerTransfer());
+        //heatMedia.loseHeat(layer1.innerTransfer());
+        //extream condition will case bug.
+        HeatExchange(heatMedia, coldMedia, layer1);
+        record2.temp1 = heatMedia.temperature;
+        record2.temp2 = heatMedia.temperature;
         timer = 0;
+    }
+    if (Bouncing(record1,record2)) {
+        console.log("bouncing");
+        heatMedia.temperature = coldMedia.temperature = totalHeat() / (heatMedia.mass * heatMedia.capacity + coldMedia.mass * coldMedia.capacity);
+
     }
 }
 
@@ -72,13 +85,32 @@ function setMat() {
             thickness: newMat.thickness,
             k: newMat.k
         };
+    } else {
+        alert("Invalid Input Value");
     }
-    else{alert("Invalid Input Value");}
 }
 
 function NumberCheck(v1, v2) {
-    if ((typeof v1 != "number") || (typeof v2 != "number")||(v1 === NaN)||(v2 === NaN)||(v1 === 0) ) {
+    if ((typeof v1 != "number") || (typeof v2 != "number") || (v1 === NaN) || (v2 === NaN) || (v1 === 0)) {
         return false;
     }
     return true;
 }
+
+function HeatExchange(m1, m2, layer) {
+    if (m1.temperature > m2.temperature) {
+        m1.loseHeat(layer.innerTransfer());
+        m2.captureHeat(layer.innerTransfer());
+    } else {
+        m1.captureHeat(layer.innerTransfer());
+        m2.loseHeat(layer.innerTransfer());
+    }
+}
+
+function Bouncing(r1, r2) {
+    if (((r1.temp1 > r1.temp2) && (r2.temp1 < r2.temp2)) || ((r1.temp1 < r1.temp2) && (r2.temp1 > r2.temp2))) {
+        return true;
+    } else return false;
+}
+
+let totalHeat=(m1, m2) => m1.capacity * m1.temperature + m2.capacity * m2.temperature;
