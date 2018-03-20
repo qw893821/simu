@@ -1,5 +1,5 @@
 "use strict"
-
+/*comment img related code to make it work on chrome*/
 let heater;
 let cooler;
 let heatMedia;
@@ -17,6 +17,7 @@ const record2 = {}
 
 function preload() {
     img = loadImage('./images/sample.jpg');
+    moveArrowRed=loadImage('./images/arrowRed.gif');
 }
 
 function setup() {
@@ -27,7 +28,7 @@ function setup() {
     coldMedia = new Media(4186, 0, 0);
     layer1 = new Room(1, 10, 1085, 401);
     timer = 0;
-    countTime = 10;
+    countTime = 30;
     imageMode(CENTER);
     image(img, width / 2, height / 2);
     textThickness = createInput();
@@ -52,6 +53,7 @@ function mouseClicked() {
 
 function Calculator() {
     if (timer >= countTime) {
+        image(moveArrowRed,100,400);
         heater.changePower();
         cooler.changePower();
         heatMedia.captureHeat(heater.power);
@@ -71,10 +73,10 @@ function Calculator() {
         timer = 0;
     }
     if (Bouncing(record1,record2)) {
-        console.log("bouncing");
-        heatMedia.temperature = coldMedia.temperature = totalHeat() / (heatMedia.mass * heatMedia.capacity + coldMedia.mass * coldMedia.capacity);
-
+        //console.log("bouncing");
+        heatMedia.temperature = coldMedia.temperature = totalHeat(heatMedia,coldMedia) / (heatMedia.mass * heatMedia.capacity + coldMedia.mass * coldMedia.capacity);
     }
+    //console.log(totalHeat(heatMedia,coldMedia));
 }
 
 function setMat() {
@@ -108,7 +110,7 @@ function HeatExchange(m1, m2, layer) {
 }
 
 function Bouncing(r1, r2) {
-    if (((r1.temp1 > r1.temp2) && (r2.temp1 < r2.temp2)) || ((r1.temp1 < r1.temp2) && (r2.temp1 > r2.temp2))) {
+    if (((r1.temp1 > r1.temp2) && (r2.temp1 < r2.temp2)) || ((r1.temp1 < r1.temp2) && (r2.temp1 >! r2.temp2))) {
         return true;
     } else return false;
 }
