@@ -12,12 +12,15 @@ let roombutton;
 const newMat = {}
 let textThickness;
 let textK;
+let heatInput;
+let coldInput;
+let heatSetBtn;
 const record1 = {}
 const record2 = {}
 
 function preload() {
-    img = loadImage('./images/sample.jpg');
-    moveArrowRed=loadImage('./images/arrowRed.gif');
+    //img = loadImage('./images/sample.jpg');
+    //moveArrowRed = loadImage('./images/arrowRed.gif');
 }
 
 function setup() {
@@ -30,11 +33,18 @@ function setup() {
     timer = 0;
     countTime = 30;
     imageMode(CENTER);
-    image(img, width / 2, height / 2);
+    //image(img, width / 2, height / 2);
     textThickness = createInput();
     textThickness.position(width / 2 - 200, 150);
     textK = createInput();
     textK.position(width / 2 + 200, 150);
+    heatInput = createInput();
+    heatInput.position(50, 50);
+    coldInput = createInput();
+    coldInput.position(450, 50);
+    heatSetBtn = createButton('Set Temperature');
+    heatSetBtn.position(width / 2, 0);
+    heatSetBtn.mousePressed(SetTemp);
     roombutton = createButton('Change Material');
     roombutton.position(width / 2, 200);
     roombutton.mousePressed(setMat);
@@ -53,7 +63,7 @@ function mouseClicked() {
 
 function Calculator() {
     if (timer >= countTime) {
-        image(moveArrowRed,100,400);
+        //image(moveArrowRed, 100, 400);
         heater.changePower();
         cooler.changePower();
         heatMedia.captureHeat(heater.power);
@@ -72,9 +82,9 @@ function Calculator() {
         record2.temp2 = heatMedia.temperature;
         timer = 0;
     }
-    if (Bouncing(record1,record2)) {
+    if (Bouncing(record1, record2)) {
         //console.log("bouncing");
-        heatMedia.temperature = coldMedia.temperature = totalHeat(heatMedia,coldMedia) / (heatMedia.mass * heatMedia.capacity + coldMedia.mass * coldMedia.capacity);
+        heatMedia.temperature = coldMedia.temperature = totalHeat(heatMedia, coldMedia) / (heatMedia.mass * heatMedia.capacity + coldMedia.mass * coldMedia.capacity);
     }
     //console.log(totalHeat(heatMedia,coldMedia));
 }
@@ -82,7 +92,7 @@ function Calculator() {
 function setMat() {
     newMat.thickness = Number(textThickness.value());
     newMat.k = Number(textK.value());
-    if (NumberCheck(newMat.thickness, newMat.k)) {
+    if (NumberCheck(newMat.thickness) && NumberCheck(newMat.k)) {
         layer1.changeMat = {
             thickness: newMat.thickness,
             k: newMat.k
@@ -92,8 +102,8 @@ function setMat() {
     }
 }
 
-function NumberCheck(v1, v2) {
-    if ((typeof v1 != "number") || (typeof v2 != "number") || (v1 === NaN) || (v2 === NaN) || (v1 === 0)) {
+function NumberCheck(v1) {
+    if ((typeof v1 != "number") || (v1 === NaN) || (v1 === 0)) {
         return false;
     }
     return true;
@@ -110,9 +120,24 @@ function HeatExchange(m1, m2, layer) {
 }
 
 function Bouncing(r1, r2) {
-    if (((r1.temp1 > r1.temp2) && (r2.temp1 < r2.temp2)) || ((r1.temp1 < r1.temp2) && (r2.temp1 >! r2.temp2))) {
+    if (((r1.temp1 > r1.temp2) && (r2.temp1 < r2.temp2)) || ((r1.temp1 < r1.temp2) && (r2.temp1 > !r2.temp2))) {
         return true;
     } else return false;
 }
 
-let totalHeat=(m1, m2) => m1.capacity * m1.temperature + m2.capacity * m2.temperature;
+let totalHeat = (m1, m2) => m1.capacity * m1.temperature + m2.capacity * m2.temperature;
+
+
+//have conflict with bouncing fucntion
+function SetTemp() {
+    let heatTemp;
+    let coldTemp;
+    heatTemp = Number(heatInput.value());
+    coldTemp = Number(coldInput.value());
+    if (NumberCheck(heatTemp)) {
+        heatMedia.temperature = heatTemp;
+    }
+    if (NumberCheck(coldTemp)) {
+        coldMedia.temperature = coldTemp;
+    }
+}
