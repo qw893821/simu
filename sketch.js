@@ -8,6 +8,8 @@ let layer1;
 let timer;
 let countTime;
 let img;
+let moveArrowRed;
+let moveArrowBlue;
 let roombutton;
 const newMat = {}
 let textThickness;
@@ -17,10 +19,17 @@ let coldInput;
 let heatSetBtn;
 const record1 = {}
 const record2 = {}
+let stopBtn;
+let stop;
+let selectMenu=$(".selector").selectmenu("wood","metal");
 
 function preload() {
-    //img = loadImage('./images/sample.jpg');
-    //moveArrowRed = loadImage('./images/arrowRed.gif');
+    img = loadImage('./images/sample.jpg');
+    moveArrowRed = createImg("./images/arrowRed.gif");
+    moveArrowRed.size(100, AUTO);
+    moveArrowBlue = createImg('./images/arrowBlue.gif');
+    moveArrowBlue.size(100, AUTO);
+
 }
 
 function setup() {
@@ -33,7 +42,7 @@ function setup() {
     timer = 0;
     countTime = 30;
     imageMode(CENTER);
-    //image(img, width / 2, height / 2);
+    image(img, width / 2, height / 2);
     textThickness = createInput();
     textThickness.position(width / 2 - 200, 150);
     textK = createInput();
@@ -50,11 +59,21 @@ function setup() {
     roombutton.mousePressed(setMat);
     newMat.thickness = 10;
     newMat.k = 401;
+    moveArrowRed.position(100, 100);
+    moveArrowBlue.position(500, 100);
+    stopBtn = createButton('Pause');
+    stopBtn.position(width / 2, 600);
+    stopBtn.mousePressed(Pause);
+    stop = false;
+    
 }
 
 function draw() {
-    timer++;
+    //timer++;
+    PauseExperment(stop);
     Calculator();
+    AnimationController(heater, cooler);
+
 }
 
 function mouseClicked() {
@@ -63,7 +82,6 @@ function mouseClicked() {
 
 function Calculator() {
     if (timer >= countTime) {
-        //image(moveArrowRed, 100, 400);
         heater.changePower();
         cooler.changePower();
         heatMedia.captureHeat(heater.power);
@@ -141,3 +159,35 @@ function SetTemp() {
         coldMedia.temperature = coldTemp;
     }
 }
+
+function AnimationController(heater, cooler) {
+    if (heater.power > 0 && !stop) {
+        moveArrowRed.show();
+    } else {
+        moveArrowRed.hide();
+    }
+    if (cooler.power > 0 && !stop) {
+        moveArrowBlue.show();
+    } else {
+        moveArrowBlue.hide();
+    }
+
+}
+
+function Pause() {
+    if (!stop) {
+        stop = true;
+    } else {
+        stop = false;
+    }
+
+}
+
+function PauseExperment(stop) {
+    if (stop) {
+        timer = 0;
+    } else {
+        timer++;
+    }
+}
+
