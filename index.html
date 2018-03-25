@@ -9,6 +9,27 @@
             margin: 0;
         }
 
+        .ui-selectmenu-menu {
+            padding: 0;
+            margin: 0;
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: none;
+        }
+
+        .ui-selectmenu-open {
+            display: block;
+        }
+
+        .ui-selectmenu-button {
+            display: inline-block;
+            overflow: hidden;
+            position: relative;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
     </style>
     <script src="libraries/p5.min.js"></script>
     <script src="libraries/p5.dom.min.js"></script>
@@ -22,13 +43,16 @@
 </head>
 
 <body>
-    <select id="selector">
+
+    <select id="selector" name="selector">
           <option disabled selected>Select A Material</option>
-        <option>Wood</option>
-          <option>Metal</option>
+            <option>New Material...</option>
+        <option>Diamond</option>
+          <option>Copper</option>
+            <option>Water Vapor</option>
+            
           
       </select>
-
 </body>
 
 </html>

@@ -21,15 +21,18 @@ const record1 = {}
 const record2 = {}
 let stopBtn;
 let stop;
-let selectMenu=$(".selector").selectmenu("wood","metal");
+let newMatName;
+let matList;
+let jSonText;
 
+/*$(document).ready(function(){
+    $("#selector").selectmenu();
+});*/
 function preload() {
-    img = loadImage('./images/sample.jpg');
     moveArrowRed = createImg("./images/arrowRed.gif");
     moveArrowRed.size(100, AUTO);
     moveArrowBlue = createImg('./images/arrowBlue.gif');
     moveArrowBlue.size(100, AUTO);
-
 }
 
 function setup() {
@@ -42,11 +45,10 @@ function setup() {
     timer = 0;
     countTime = 30;
     imageMode(CENTER);
-    image(img, width / 2, height / 2);
-    textThickness = createInput();
-    textThickness.position(width / 2 - 200, 150);
-    textK = createInput();
-    textK.position(width / 2 + 200, 150);
+    //textThickness = createInput();
+    //textThickness.position(width / 2 - 200, 150);
+    //textK = createInput();
+    //textK.position(width / 2 + 200, 150);
     heatInput = createInput();
     heatInput.position(50, 50);
     coldInput = createInput();
@@ -54,9 +56,9 @@ function setup() {
     heatSetBtn = createButton('Set Temperature');
     heatSetBtn.position(width / 2, 0);
     heatSetBtn.mousePressed(SetTemp);
-    roombutton = createButton('Change Material');
-    roombutton.position(width / 2, 200);
-    roombutton.mousePressed(setMat);
+    roombutton = createButton('Submit');
+    roombutton.position(width / 3, height - 20);
+    roombutton.mousePressed(SetMat);
     newMat.thickness = 10;
     newMat.k = 401;
     moveArrowRed.position(100, 100);
@@ -65,8 +67,14 @@ function setup() {
     stopBtn.position(width / 2, 600);
     stopBtn.mousePressed(Pause);
     stop = false;
-    
+    jSonText = '{"Material":[' +
+        '{"Name":"Diamond","k":"1000" },' +
+        '{"Name":"Copper","k":"401" },' +
+        '{"Name":"Water Vapor","k":"0.6" }]}';
+    matList = JSON.parse(jSonText);
 }
+
+
 
 function draw() {
     //timer++;
@@ -77,7 +85,7 @@ function draw() {
 }
 
 function mouseClicked() {
-
+    console.log(newMat.k);
 }
 
 function Calculator() {
@@ -107,18 +115,7 @@ function Calculator() {
     //console.log(totalHeat(heatMedia,coldMedia));
 }
 
-function setMat() {
-    newMat.thickness = Number(textThickness.value());
-    newMat.k = Number(textK.value());
-    if (NumberCheck(newMat.thickness) && NumberCheck(newMat.k)) {
-        layer1.changeMat = {
-            thickness: newMat.thickness,
-            k: newMat.k
-        };
-    } else {
-        alert("Invalid Input Value");
-    }
-}
+
 
 function NumberCheck(v1) {
     if ((typeof v1 != "number") || (v1 === NaN) || (v1 === 0)) {
@@ -191,3 +188,23 @@ function PauseExperment(stop) {
     }
 }
 
+function SetMat() {
+    let select = document.getElementById('selector');
+    newMatName = select.options[select.selectedIndex].value;
+    for (let i = 0; i < matList.Material.length; i++) {
+        if (newMatName == matList.Material[i].Name) {
+            newMat.k = Number(matList.Material[i].k);
+        }
+    }
+    if (newMatName == "New Material...") {
+        AddNewMat(newMatName);
+    }
+    //layer1.k=newMat.k;
+}
+
+function AddNewMat(name) {
+    let select = document.getElementById('selector');
+    let option = document.createElement('option');
+    option.text = "test";
+    select.add(option);
+}
