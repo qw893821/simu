@@ -10,6 +10,7 @@ let countTime;
 let img;
 let moveArrowRed;
 let moveArrowBlue;
+let heatArea;
 let roombutton;
 const newMat = {}
 let textThickness;
@@ -24,23 +25,39 @@ let stop;
 let newMatName;
 let matList;
 let jSonText;
+let heatCavs;
+let coldCavs;
+let heatTemp;
+let coldTemp;
 
-/*$(document).ready(function(){
-    $("#selector").selectmenu();
-});*/
+function openDia() {
+    $("#MatCreate").dialog('open');
+}
+
+function closeDia() {
+    $("#MatCreate").dialog('close');
+}
+$(document).ready(function () {
+    $("#MatCreate").dialog();
+    $("#MatCreate").dialog('close');
+    $("#confirm").click(creatNewMat);
+    $("#cancel").click(closeDia);
+});
+
 function preload() {
     moveArrowRed = createImg("./images/arrowRed.gif");
     moveArrowRed.size(100, AUTO);
     moveArrowBlue = createImg('./images/arrowBlue.gif');
     moveArrowBlue.size(100, AUTO);
+
 }
 
 function setup() {
-    createCanvas(600, 700);
-    heater = new Heater();
-    cooler = new Heater(500, 100);
-    heatMedia = new Media(2050, 0, 50);
-    coldMedia = new Media(4186, 0, 0);
+    createCanvas(windowWidth, 400);
+    heater = new Heater(100,450);
+    cooler = new Heater(500, 450);
+    heatMedia = new Media(2050);
+    coldMedia = new Media(4186);
     layer1 = new Room(1, 10, 1085, 401);
     timer = 0;
     countTime = 30;
@@ -50,28 +67,37 @@ function setup() {
     //textK = createInput();
     //textK.position(width / 2 + 200, 150);
     heatInput = createInput();
-    heatInput.position(50, 50);
+    heatInput.position(80, 500);
     coldInput = createInput();
-    coldInput.position(450, 50);
+    coldInput.position(width / 2+50, 500);
     heatSetBtn = createButton('Set Temperature');
-    heatSetBtn.position(width / 2, 0);
+    heatSetBtn.position(width / 2-150, 500);
     heatSetBtn.mousePressed(SetTemp);
-    roombutton = createButton('Submit');
-    roombutton.position(width / 3, height - 20);
+    roombutton = createButton('Submit Material');
+    roombutton.position(180, 555);
     roombutton.mousePressed(SetMat);
     newMat.thickness = 10;
     newMat.k = 401;
-    moveArrowRed.position(100, 100);
-    moveArrowBlue.position(500, 100);
-    stopBtn = createButton('Pause');
-    stopBtn.position(width / 2, 600);
+    moveArrowRed.position(100, 280);
+    moveArrowBlue.position(500, 280);
+    stopBtn = createButton('Pause Experiment');
+    stopBtn.position(width / 2, 555);
     stopBtn.mousePressed(Pause);
     stop = false;
     jSonText = '{"Material":[' +
         '{"Name":"Diamond","k":"1000" },' +
         '{"Name":"Copper","k":"401" },' +
-        '{"Name":"Water Vapor","k":"0.6" }]}';
+        '{"Name":"Water Vapor","k":"0.6" },' +
+        '{"Name":"Mercury","k":"8.34" },' +
+        '{"Name":"Silver","k":"420"}]}';
     matList = JSON.parse(jSonText);
+    createSelectList();
+    heatCavs = $("#heat");
+    coldCavs = $("#cold");
+    heatTemp=createElement('p');
+    heatTemp.position(0,height/2);
+    coldTemp=createElement('p');
+    coldTemp.position(width-200,height/2);
 }
 
 
@@ -81,7 +107,10 @@ function draw() {
     PauseExperment(stop);
     Calculator();
     AnimationController(heater, cooler);
-
+    fillCanvas(heatMedia.temperature,heatCavs);
+    fillCanvas(coldMedia.temperature,coldCavs);
+    heatTemp.html(heatMedia.temperature.toFixed(4));
+    coldTemp.html(coldMedia.temperature.toFixed(4));
 }
 
 function mouseClicked() {
@@ -94,8 +123,6 @@ function Calculator() {
         cooler.changePower();
         heatMedia.captureHeat(heater.power);
         coldMedia.loseHeat(cooler.power);
-        heatMedia.updateText();
-        coldMedia.updateText();
         record1.temp1 = heatMedia.temperature;
         record1.temp2 = coldMedia.temperature;
         layer1.tempSide1 = heatMedia.temperature;
@@ -168,7 +195,6 @@ function AnimationController(heater, cooler) {
     } else {
         moveArrowBlue.hide();
     }
-
 }
 
 function Pause() {
@@ -199,12 +225,65 @@ function SetMat() {
     if (newMatName == "New Material...") {
         AddNewMat(newMatName);
     }
-    //layer1.k=newMat.k;
+    layer1.k = newMat.k;
 }
 
 function AddNewMat(name) {
+    //let select = document.getElementById('selector');
+    //let option = document.createElement('option');
+    //option.text = "test";
+    //select.add(option);
+    openDia();
+}
+
+function creatNewMat() {
     let select = document.getElementById('selector');
     let option = document.createElement('option');
-    option.text = "test";
-    select.add(option);
+    let name = document.getElementById('name');
+    let conducitvity = document.getElementById('conductivity');
+    if (createCheck(name, conducitvity)) {
+        option.text = name.value;
+        select.add(option);
+        matList.Material[matList.Material.length] = {
+            Name: name.value,
+            k: Number(conducitvity.value)
+        };
+    } else {
+        alert("invalid input")
+    }
+    closeDia();
+}
+
+function createCheck(name, num) {
+    if ((typeof name.value === 'string') && (NumberCheck(Number(num.value)))) {
+        return true;
+    } else {
+        console.log(typeof name.value)
+        return false;
+    }
+}
+
+function createSelectList() {
+    for (let i = 0; i < matList.Material.length; i++) {
+        let select = document.getElementById('selector');
+        let option = document.createElement('option');
+        option.text = matList.Material[i].Name;
+        select.add(option);
+    }
+}
+
+function fillCanvas(temp, cavs) {
+    if (temp > 0) {
+        let colorg = map(temp, 0, 100, 170, 70);
+        let colorb = map(temp, 0, 100, 255, 30);
+        let colorr=250;
+        cavs.css("background-color", `rgb(${colorr},${colorg},${colorb})`);
+    }
+    else if(temp<0){
+        let colorg = map(temp, 0, 100, 170, 70);
+        let colorr = map(temp, 0, -100, 255, 30);
+        let colorb=250;
+        cavs.css("background-color", `rgb(${colorr},${colorg},${colorb})`);
+    }
+    else {cavs.css("background-color", `rgb(255,255,255)`);}
 }

@@ -3,34 +3,7 @@
 
 <head>
     <meta name="viewport" width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0>
-    <style>
-        body {
-            padding: 0;
-            margin: 0;
-        }
 
-        .ui-selectmenu-menu {
-            padding: 0;
-            margin: 0;
-            position: absolute;
-            top: 0;
-            left: 0;
-            display: none;
-        }
-
-        .ui-selectmenu-open {
-            display: block;
-        }
-
-        .ui-selectmenu-button {
-            display: inline-block;
-            overflow: hidden;
-            position: relative;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-    </style>
     <script src="libraries/p5.min.js"></script>
     <script src="libraries/p5.dom.min.js"></script>
     <script src="libraries/p5.sound.min.js"></script>
@@ -40,19 +13,52 @@
     <script src="Heater.js"></script>
     <script src="Media.js"></script>
     <script src="sketch.js"></script>
+    <style>
+        #MatCreate{
+            background:#fbca93;
+        }
+        #selector{
+            margin-top:550px;
+        }
+        #heat_div{
+            position: absolute;
+            top: 20px;
+            left:80px;
+        }
+        #heat{
+            position: absolute;
+            border-style:solid;
+        }
+        #cold_div{
+            position:absolute;
+            top:20px;
+            right:50%;
+        }
+        #cold{
+            position: absolute;
+            border-style:solid;
+        }
+    </style>
 </head>
 
 <body>
 
     <select id="selector" name="selector">
           <option disabled selected>Select A Material</option>
-            <option>New Material...</option>
-        <option>Diamond</option>
-          <option>Copper</option>
-            <option>Water Vapor</option>
-            
-          
+            <option>New Material...</option>             
       </select>
+    <div id="heat_div"><canvas id="heat" width="200" height="250"></canvas></div>
+    <div id="cold_div"><canvas id="cold" width="200" height="250"></canvas></div>
+    <div id="MatCreate">
+        <br>
+        <p>Create New Material</p>
+        Name_____________  
+        <input type="text" id="name"><br>
+        Thermal Conductivity
+        <input type="text" id="conductivity">
+        <button type="button" id="confirm" text="Confirm">Confirm</button>
+        <button type="button" id="cancel">Cancel</button>
+    </div>
 </body>
 
 </html>
