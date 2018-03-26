@@ -10,6 +10,8 @@ let countTime;
 let img;
 let moveArrowRed;
 let moveArrowBlue;
+let lrArrow;
+let rlArrow;
 let heatArea;
 let roombutton;
 const newMat = {}
@@ -27,7 +29,9 @@ let matList;
 let jSonText;
 let heatCavs;
 let coldCavs;
+let heatTitle;
 let heatTemp;
+let coldTitle;
 let coldTemp;
 
 function openDia() {
@@ -49,12 +53,15 @@ function preload() {
     moveArrowRed.size(100, AUTO);
     moveArrowBlue = createImg('./images/arrowBlue.gif');
     moveArrowBlue.size(100, AUTO);
-
+    lrArrow = createImg("./images/lrarrow.gif");
+    lrArrow.size(AUTO, 70);
+    rlArrow = createImg("./images/rlarrow.gif")
+    rlArrow.size(AUTO, 70);
 }
 
 function setup() {
     createCanvas(windowWidth, 400);
-    heater = new Heater(100,450);
+    heater = new Heater(100, 450);
     cooler = new Heater(500, 450);
     heatMedia = new Media(2050);
     coldMedia = new Media(4186);
@@ -62,24 +69,22 @@ function setup() {
     timer = 0;
     countTime = 30;
     imageMode(CENTER);
-    //textThickness = createInput();
-    //textThickness.position(width / 2 - 200, 150);
-    //textK = createInput();
-    //textK.position(width / 2 + 200, 150);
     heatInput = createInput();
     heatInput.position(80, 500);
     coldInput = createInput();
-    coldInput.position(width / 2+50, 500);
+    coldInput.position(width / 2 + 50, 500);
     heatSetBtn = createButton('Set Temperature');
-    heatSetBtn.position(width / 2-150, 500);
+    heatSetBtn.position(width / 2 - 150, 500);
     heatSetBtn.mousePressed(SetTemp);
     roombutton = createButton('Submit Material');
     roombutton.position(180, 555);
     roombutton.mousePressed(SetMat);
     newMat.thickness = 10;
     newMat.k = 401;
-    moveArrowRed.position(100, 280);
+    moveArrowRed.position(150, 280);
     moveArrowBlue.position(500, 280);
+    lrArrow.position(width / 2 - 200, height / 2 - 100);
+    rlArrow.position(width / 2 - 180, height / 2 - 100);
     stopBtn = createButton('Pause Experiment');
     stopBtn.position(width / 2, 555);
     stopBtn.mousePressed(Pause);
@@ -94,27 +99,32 @@ function setup() {
     createSelectList();
     heatCavs = $("#heat");
     coldCavs = $("#cold");
-    heatTemp=createElement('p');
-    heatTemp.position(0,height/2);
-    coldTemp=createElement('p');
-    coldTemp.position(width-200,height/2);
+    heatTitle = createElement('p', 'Currnet Temperature:');
+    heatTitle.position(0, height / 2 + 70);
+    heatTemp = createElement('p');
+    heatTemp.position(0, height / 2 + 90);
+    coldTitle = createElement('p', 'Currnet Temperature:');
+    coldTitle.position(width - 250, height / 2 + 70);
+    coldTemp = createElement('p');
+    coldTemp.position(width - 250, height / 2 + 90);
 }
 
 
 
 function draw() {
-    //timer++;
     PauseExperment(stop);
     Calculator();
     AnimationController(heater, cooler);
-    fillCanvas(heatMedia.temperature,heatCavs);
-    fillCanvas(coldMedia.temperature,coldCavs);
+    showTransformArrow(heatMedia, coldMedia);
+    fillCanvas(heatMedia.temperature, heatCavs);
+    fillCanvas(coldMedia.temperature, coldCavs);
     heatTemp.html(heatMedia.temperature.toFixed(4));
     coldTemp.html(coldMedia.temperature.toFixed(4));
+
 }
 
 function mouseClicked() {
-    console.log(newMat.k);
+
 }
 
 function Calculator() {
@@ -127,25 +137,23 @@ function Calculator() {
         record1.temp2 = coldMedia.temperature;
         layer1.tempSide1 = heatMedia.temperature;
         layer1.tempSide2 = coldMedia.temperature;
-        //coldMedia.captureHeat(layer1.innerTransfer());
-        //heatMedia.loseHeat(layer1.innerTransfer());
-        //extream condition will case bug.
         HeatExchange(heatMedia, coldMedia, layer1);
         record2.temp1 = heatMedia.temperature;
-        record2.temp2 = heatMedia.temperature;
+        record2.temp2 = coldMedia.temperature;
         timer = 0;
+        if (Bouncing(record1, record2)) {
+            heatMedia.temperature = coldMedia.temperature = totalHeat(heatMedia, coldMedia) / (heatMedia.mass * heatMedia.capacity + coldMedia.mass * coldMedia.capacity);
+        }
+
     }
-    if (Bouncing(record1, record2)) {
-        //console.log("bouncing");
-        heatMedia.temperature = coldMedia.temperature = totalHeat(heatMedia, coldMedia) / (heatMedia.mass * heatMedia.capacity + coldMedia.mass * coldMedia.capacity);
-    }
-    //console.log(totalHeat(heatMedia,coldMedia));
+
 }
 
 
 
+
 function NumberCheck(v1) {
-    if ((typeof v1 != "number") || (v1 === NaN) || (v1 === 0)) {
+    if ((typeof v1 != "number") || (v1 === NaN)) {
         return false;
     }
     return true;
@@ -162,9 +170,11 @@ function HeatExchange(m1, m2, layer) {
 }
 
 function Bouncing(r1, r2) {
-    if (((r1.temp1 > r1.temp2) && (r2.temp1 < r2.temp2)) || ((r1.temp1 < r1.temp2) && (r2.temp1 > !r2.temp2))) {
+    if (((r1.temp1 > r1.temp2) && (r2.temp1 < r2.temp2)) || ((r1.temp1 < r1.temp2) && (r2.temp1 > r2.temp2))) {
         return true;
-    } else return false;
+    } else {
+        return false;
+    }
 }
 
 let totalHeat = (m1, m2) => m1.capacity * m1.temperature + m2.capacity * m2.temperature;
@@ -176,12 +186,14 @@ function SetTemp() {
     let coldTemp;
     heatTemp = Number(heatInput.value());
     coldTemp = Number(coldInput.value());
-    if (NumberCheck(heatTemp)) {
+    if (NumberCheck(heatTemp)&&!isNaN(heatTemp)) {
         heatMedia.temperature = heatTemp;
     }
-    if (NumberCheck(coldTemp)) {
+    else {alert("not number");}
+    if (NumberCheck(coldTemp)&&!isNaN(coldTemp)) {
         coldMedia.temperature = coldTemp;
     }
+    else {alert("not number");}
 }
 
 function AnimationController(heater, cooler) {
@@ -229,10 +241,6 @@ function SetMat() {
 }
 
 function AddNewMat(name) {
-    //let select = document.getElementById('selector');
-    //let option = document.createElement('option');
-    //option.text = "test";
-    //select.add(option);
     openDia();
 }
 
@@ -276,14 +284,27 @@ function fillCanvas(temp, cavs) {
     if (temp > 0) {
         let colorg = map(temp, 0, 100, 170, 70);
         let colorb = map(temp, 0, 100, 255, 30);
-        let colorr=250;
+        let colorr = 250;
         cavs.css("background-color", `rgb(${colorr},${colorg},${colorb})`);
-    }
-    else if(temp<0){
-        let colorg = map(temp, 0, 100, 170, 70);
+    } else if (temp < 0) {
+        let colorg = map(temp, 0, -100, 170, 70);
         let colorr = map(temp, 0, -100, 255, 30);
-        let colorb=250;
+        let colorb = 250;
         cavs.css("background-color", `rgb(${colorr},${colorg},${colorb})`);
+    } else {
+        cavs.css("background-color", `rgb(255,255,255)`);
     }
-    else {cavs.css("background-color", `rgb(255,255,255)`);}
+}
+
+function showTransformArrow(media1, media2) {
+    if (media1.temperature > media2.temperature && !stop) {
+        lrArrow.show();
+        rlArrow.hide();
+    } else if (media1.temperature < media2.temperature && !stop) {
+        lrArrow.hide();
+        rlArrow.show();
+    } else {
+        lrArrow.hide();
+        rlArrow.hide();
+    }
 }
