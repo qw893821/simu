@@ -35,6 +35,8 @@ let coldTitle;
 let coldTemp;
 let heatSet;
 let coldSet;
+let text1;
+let text2;
 
 function openDia() {
     $("#MatCreate").dialog('open');
@@ -48,6 +50,15 @@ $(document).ready(function () {
     $("#MatCreate").dialog('close');
     $("#confirm").click(creatNewMat);
     $("#cancel").click(closeDia);
+    $("#mat_window").dialog();
+    $("#mat_window").dialog('close');
+    $("#material_cavs").mouseenter(function(){
+        $("#mat_window").dialog('open');
+        $("#test1").html(text1);
+    });
+    $("#material_cavs").mouseleave(function(){
+        $("#mat_window").dialog('close');
+    })
 });
 
 function preload() {
@@ -127,7 +138,7 @@ function draw() {
     fillCanvas(coldMedia.temperature, coldCavs);
     heatTemp.html(heatMedia.temperature.toFixed(4));
     coldTemp.html(coldMedia.temperature.toFixed(4));
-
+    text1=toString(layer1.k);
 }
 
 function mouseClicked() {
@@ -314,4 +325,8 @@ function showTransformArrow(media1, media2) {
         lrArrow.hide();
         rlArrow.hide();
     }
+}
+
+function getData(){
+    
 }
