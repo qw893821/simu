@@ -52,11 +52,11 @@ $(document).ready(function () {
     $("#cancel").click(closeDia);
     $("#mat_window").dialog();
     $("#mat_window").dialog('close');
-    $("#material_cavs").mouseenter(function(){
+    $("#material_cavs").mouseenter(function () {
         $("#mat_window").dialog('open');
-        $("#test1").html(text1);
+        $("#text1").html(text1);
     });
-    $("#material_cavs").mouseleave(function(){
+    $("#material_cavs").mouseleave(function () {
         $("#mat_window").dialog('close');
     })
 });
@@ -84,12 +84,12 @@ function setup() {
     imageMode(CENTER);
     heatInput = createInput();
     heatInput.position(80, 500);
-    heatSet=createElement('p','Temperature');
-    heatSet.position(0,480);
+    heatSet = createElement('p', 'Temperature');
+    heatSet.position(0, 480);
     coldInput = createInput();
     coldInput.position(width / 2 + 50, 500);
-    coldSet=createElement('p','Temperature');
-    coldSet.position(width / 2 + 200,480);
+    coldSet = createElement('p', 'Temperature');
+    coldSet.position(width / 2 + 200, 480);
     heatSetBtn = createButton('Set Temperature');
     heatSetBtn.position(width / 2 - 150, 500);
     heatSetBtn.mousePressed(SetTemp);
@@ -124,7 +124,7 @@ function setup() {
     coldTitle.position(600, height / 2 + 70);
     coldTemp = createElement('p');
     coldTemp.position(600, height / 2 + 90);
-    
+
 }
 
 
@@ -138,7 +138,6 @@ function draw() {
     fillCanvas(coldMedia.temperature, coldCavs);
     heatTemp.html(heatMedia.temperature.toFixed(4));
     coldTemp.html(coldMedia.temperature.toFixed(4));
-    text1=toString(layer1.k);
 }
 
 function mouseClicked() {
@@ -166,7 +165,7 @@ function Calculator() {
         }
 
     }
-
+    text1 = "Current Conductivity: "+layer1.k.toString();
 }
 
 
@@ -204,14 +203,16 @@ function SetTemp() {
     let coldTemp;
     heatTemp = Number(heatInput.value());
     coldTemp = Number(coldInput.value());
-    if (NumberCheck(heatTemp)&&!isNaN(heatTemp)) {
+    if (NumberCheck(heatTemp) && !isNaN(heatTemp)) {
         heatMedia.temperature = heatTemp;
+    } else {
+        alert("not number");
     }
-    else {alert("not number");}
-    if (NumberCheck(coldTemp)&&!isNaN(coldTemp)) {
+    if (NumberCheck(coldTemp) && !isNaN(coldTemp)) {
         coldMedia.temperature = coldTemp;
+    } else {
+        alert("not number");
     }
-    else {alert("not number");}
 }
 
 function AnimationController(heater, cooler) {
@@ -327,6 +328,6 @@ function showTransformArrow(media1, media2) {
     }
 }
 
-function getData(){
-    
+function getData() {
+
 }
