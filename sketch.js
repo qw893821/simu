@@ -33,6 +33,8 @@ let heatTitle;
 let heatTemp;
 let coldTitle;
 let coldTemp;
+let heatSet;
+let coldSet;
 
 function openDia() {
     $("#MatCreate").dialog('open');
@@ -71,8 +73,12 @@ function setup() {
     imageMode(CENTER);
     heatInput = createInput();
     heatInput.position(80, 500);
+    heatSet=createElement('p','Temperature');
+    heatSet.position(0,480);
     coldInput = createInput();
     coldInput.position(width / 2 + 50, 500);
+    coldSet=createElement('p','Temperature');
+    coldSet.position(width / 2 + 200,480);
     heatSetBtn = createButton('Set Temperature');
     heatSetBtn.position(width / 2 - 150, 500);
     heatSetBtn.mousePressed(SetTemp);
@@ -83,8 +89,8 @@ function setup() {
     newMat.k = 401;
     moveArrowRed.position(150, 280);
     moveArrowBlue.position(500, 280);
-    lrArrow.position(width / 2 - 200, height / 2 - 100);
-    rlArrow.position(width / 2 - 180, height / 2 - 100);
+    lrArrow.position(width / 2 - 200, height / 2 - 120);
+    rlArrow.position(width / 2 - 120, height / 2 - 120);
     stopBtn = createButton('Pause Experiment');
     stopBtn.position(width / 2, 555);
     stopBtn.mousePressed(Pause);
@@ -104,9 +110,10 @@ function setup() {
     heatTemp = createElement('p');
     heatTemp.position(0, height / 2 + 90);
     coldTitle = createElement('p', 'Currnet Temperature:');
-    coldTitle.position(width - 250, height / 2 + 70);
+    coldTitle.position(600, height / 2 + 70);
     coldTemp = createElement('p');
-    coldTemp.position(width - 250, height / 2 + 90);
+    coldTemp.position(600, height / 2 + 90);
+    
 }
 
 
@@ -135,6 +142,8 @@ function Calculator() {
         coldMedia.loseHeat(cooler.power);
         record1.temp1 = heatMedia.temperature;
         record1.temp2 = coldMedia.temperature;
+        //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/const
+        //how to manipulate const
         layer1.tempSide1 = heatMedia.temperature;
         layer1.tempSide2 = coldMedia.temperature;
         HeatExchange(heatMedia, coldMedia, layer1);
@@ -179,8 +188,6 @@ function Bouncing(r1, r2) {
 
 let totalHeat = (m1, m2) => m1.capacity * m1.temperature + m2.capacity * m2.temperature;
 
-
-//have conflict with bouncing fucntion
 function SetTemp() {
     let heatTemp;
     let coldTemp;
@@ -257,7 +264,7 @@ function creatNewMat() {
             k: Number(conducitvity.value)
         };
     } else {
-        alert("invalid input")
+        alert("invalid input");
     }
     closeDia();
 }
