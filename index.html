@@ -14,45 +14,53 @@
     <script src="Media.js"></script>
     <script src="sketch.js"></script>
     <style>
-        #MatCreate{
-            background:#fbca93;
-            border-style:groove;
+        #MatCreate {
+            background: #fbca93;
+            border-style: groove;
         }
-        #selector{
-            margin-top:550px;
-            
+
+        #selector {
+            margin-top: 550px;
+
         }
-        #heat_div{
+
+        #heat_div {
             position: absolute;
             top: 20px;
-            left:80px;
-            
+            left: 80px;
+
         }
-        #heat{
+
+        #heat {
             position: absolute;
-            border-style:solid;
+            border-style: solid;
         }
-        #cold_div{
-            position:absolute;
-            top:20px;
-            right:50%;
-        }
-        #cold{
+
+        #cold_div {
             position: absolute;
-            border-style:solid;
+            top: 20px;
+            left: 390px;
         }
-        #material{
-            position:absolute;
-            top:150px;
-            left:285px;
-            
+
+        #cold {
+            position: absolute;
+            border-style: solid;
         }
-        #material_cavs{
+
+        #material {
+            position: absolute;
+            top: 150px;
+            left: 285px;
+
+        }
+
+        #material_cavs {
             position: absolute;
             background-color: aqua;
             border-style: solid;
             border-left: none;
         }
+
     </style>
 </head>
 <!-- http://www.sitepoint.com/forums/showthread.php?54844-lt-body-onLoad-quot-resizeTo(382-430)-quot-gt how to resize broswer-->
@@ -69,9 +77,8 @@
     <div id="MatCreate">
         <br>
         <p>Create New Material</p>
-        Name_____________  
-        <input type="text" id="name"><br>
-        Thermal Conductivity
+        Name_____________
+        <input type="text" id="name"><br> Thermal Conductivity
         <input type="text" id="conductivity">
         <button type="button" id="confirm" text="Confirm">Confirm</button>
         <button type="button" id="cancel">Cancel</button>
@@ -80,6 +87,10 @@
         <p id="text1"></p>
         <p id="text2"></p>
     </div>
+    <img src='images/arrowBlue.gif' style="display: none;" />
+    <img src="images/arrowRed.gif" style="display: none;" />
+    <img src="images/lrarrow.gif" style="display: none;" />
+    <img src="images/rlarrow.gif" style="display: none;" />
 </body>
 
 </html>

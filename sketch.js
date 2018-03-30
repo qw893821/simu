@@ -1,50 +1,74 @@
 "use strict"
-/*comment img related code to make it work on chrome*/
+/*All image is draw by myself*/
+/*heat related staff
+ *heater is one to create heat to the left media called heatMedia
+ *heatTitle is the test show "current tempeature"
+ *heatTemp is the one show temperature value
+ *heatSet is the text indicate filed for manually set heat temperature
+ *heatInput is the input filed for manually set heat temperature
+ */
 let heater;
-let cooler;
 let heatMedia;
-let coldMedia;
+let heatCavs;
+let heatTitle;
+let heatTemp;
+let heatSet;
+let heatInput;
+//layer1 is the media in the center to transfer heat
 let layer1;
+//timer and countTime are used to make sure the calculate work 2fps
 let timer;
 let countTime;
-let img;
+//images
 let moveArrowRed;
 let moveArrowBlue;
 let lrArrow;
 let rlArrow;
-let heatArea;
-let roombutton;
-const newMat = {}
-let textThickness;
-let textK;
-let heatInput;
-let coldInput;
+/*roombutton the button used to submit material selection
+ *heatSetBtn the button to set temperature
+ *stopBtn the button to stop simulation
+ */
 let heatSetBtn;
-const record1 = {}
-const record2 = {}
+let roombutton;
 let stopBtn;
+//boolean value to determin if the simulation is stopped
 let stop;
 let newMatName;
+
 let matList;
 let jSonText;
-let heatCavs;
-let coldCavs;
-let heatTitle;
-let heatTemp;
+
+/*cold related staff
+ *cooler is one to create heat to the right media called coldMedia
+ *coldTitle is the test show "current tempeature"
+ *coldTemp is the one show temperature value
+ *coldSet is the text indicate filed for manually set heat temperature
+ *coldInput is the input filed for manually set heat temperature
+ */
+let coldMedia;
+let cooler;
 let coldTitle;
 let coldTemp;
-let heatSet;
 let coldSet;
+let coldCavs;
+let coldInput;
+//test shows the material name in when mouse is overthe media
 let text1;
-let text2;
+//this two const record records the temperature before and after the temperature have changed.
+const record1 = {}
+const record2 = {}
+//const of the newMat, record the new material name and k
+const newMat = {}
 
+//this function open the material input field
 function openDia() {
     $("#MatCreate").dialog('open');
 }
-
+//this function close the material input field
 function closeDia() {
     $("#MatCreate").dialog('close');
 }
+//when DOM are fully initialized load the follow things.
 $(document).ready(function () {
     $("#MatCreate").dialog();
     $("#MatCreate").dialog('close');
@@ -52,15 +76,16 @@ $(document).ready(function () {
     $("#cancel").click(closeDia);
     $("#mat_window").dialog();
     $("#mat_window").dialog('close');
+    //mousemover the media to show current material k value
     $("#material_cavs").mouseenter(function () {
         $("#mat_window").dialog('open');
         $("#text1").html(text1);
     });
     $("#material_cavs").mouseleave(function () {
         $("#mat_window").dialog('close');
-    })
+    });
 });
-
+//image in P5js should be load in preload
 function preload() {
     moveArrowRed = createImg("./images/arrowRed.gif");
     moveArrowRed.size(100, AUTO);
@@ -76,8 +101,8 @@ function setup() {
     createCanvas(windowWidth, 400);
     heater = new Heater(100, 450);
     cooler = new Heater(500, 450);
-    heatMedia = new Media(2050);
-    coldMedia = new Media(4186);
+    heatMedia = new Media(2050,100,400);
+    coldMedia = new Media(4186,500,400);
     layer1 = new Room(1, 10, 1085, 401);
     timer = 0;
     countTime = 30;
@@ -136,14 +161,13 @@ function draw() {
     showTransformArrow(heatMedia, coldMedia);
     fillCanvas(heatMedia.temperature, heatCavs);
     fillCanvas(coldMedia.temperature, coldCavs);
-    heatTemp.html(heatMedia.temperature.toFixed(4));
-    coldTemp.html(coldMedia.temperature.toFixed(4));
+    heatTemp.html(`${heatMedia.temperature.toFixed(4)}F`);
+    coldTemp.html(`${coldMedia.temperature.toFixed(4)}F`);
 }
 
-function mouseClicked() {
-
-}
-
+/*main function of the simulation
+ *this calculator will run 2 times per second becuase of the timer check(default 60fps)
+ */
 function Calculator() {
     if (timer >= countTime) {
         heater.changePower();
@@ -152,8 +176,9 @@ function Calculator() {
         coldMedia.loseHeat(cooler.power);
         record1.temp1 = heatMedia.temperature;
         record1.temp2 = coldMedia.temperature;
-        //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/const
-        //how to manipulate const
+        /*“Const.” MDN Web Docs, developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/const. 
+        https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/const
+        how to manipulate const*/
         layer1.tempSide1 = heatMedia.temperature;
         layer1.tempSide2 = coldMedia.temperature;
         HeatExchange(heatMedia, coldMedia, layer1);
@@ -165,19 +190,26 @@ function Calculator() {
         }
 
     }
-    text1 = "Current Conductivity: "+layer1.k.toString();
+    text1 = "Current Conductivity: " + layer1.k.toString();
 }
 
 
 
-
+/*this numberCheck function is inappropriate. 
+ ×must be missing somthing but cannot figure out
+ *first step check if v1's type is number
+ *check if v1 is "not a number"
+ *I will pass a variable which is converted to number type with Number() function so the first check is useless. So I use the second check to make sure the input value is not "NaN"
+*/
 function NumberCheck(v1) {
     if ((typeof v1 != "number") || (v1 === NaN)) {
         return false;
     }
     return true;
 }
-
+/*Check the thermal transfor direction, which with high temperature value will transfor heat to the lower one.
+ *one with higher temperature will lost temperature and the lower one will get the heat
+ */
 function HeatExchange(m1, m2, layer) {
     if (m1.temperature > m2.temperature) {
         m1.loseHeat(layer.innerTransfer());
@@ -187,7 +219,9 @@ function HeatExchange(m1, m2, layer) {
         m2.loseHeat(layer.innerTransfer());
     }
 }
-
+/*when the transform rate is two high, either a high thermal conducition value of large temperature gap, the thermal transform data will be extream large which make the lower temperature become high than the former higher one become lower, I call it bouncing
+ *to avoid bouncing, I check the value before(r1) and after(r2) the heat transform, the if bouncing apperas, is will return true.
+ */
 function Bouncing(r1, r2) {
     if (((r1.temp1 > r1.temp2) && (r2.temp1 < r2.temp2)) || ((r1.temp1 < r1.temp2) && (r2.temp1 > r2.temp2))) {
         return true;
@@ -195,9 +229,22 @@ function Bouncing(r1, r2) {
         return false;
     }
 }
-
+//try to use ES6 arrow function. look cool, with the function in one line
+/*This line is the same as the following function
+fucntion totaHeat(m1,m2){
+    return m1.capacity * m1.temperature + m2.capacity * m2.temperature;
+}
+*/
 let totalHeat = (m1, m2) => m1.capacity * m1.temperature + m2.capacity * m2.temperature;
 
+/*Function used to set the temperature of the input value from the temperature input box.
+ *heatMedia will have the the value from heatInput input box
+ *coldMedia will have the value from coldInput input box
+ *when the value is not a number, user will get a alter, and number will not set.
+ *can set one value at a time 
+ *isNaN() is the better way to check if the input is number;
+ “IsNaN().” MDN Web Docs, developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/isNaN. 
+ */
 function SetTemp() {
     let heatTemp;
     let coldTemp;
@@ -215,6 +262,7 @@ function SetTemp() {
     }
 }
 
+//this function shows/hide the .git file. when there is no input, the image will hide.
 function AnimationController(heater, cooler) {
     if (heater.power > 0 && !stop) {
         moveArrowRed.show();
@@ -227,16 +275,17 @@ function AnimationController(heater, cooler) {
         moveArrowBlue.hide();
     }
 }
-
+/*pause the simulation by setting the value to true
+ *continue when the value is false
+ */
 function Pause() {
     if (!stop) {
         stop = true;
     } else {
         stop = false;
     }
-
 }
-
+//force to set the timer to 0 to stop the calculation
 function PauseExperment(stop) {
     if (stop) {
         timer = 0;
@@ -244,7 +293,10 @@ function PauseExperment(stop) {
         timer++;
     }
 }
-
+/*set the material type
+ *if select meun is with a certain type of name, if will set to the chiosen material
+ *if select one is "New material", then show the input field to set a new material
+ */
 function SetMat() {
     let select = document.getElementById('selector');
     newMatName = select.options[select.selectedIndex].value;
@@ -258,11 +310,13 @@ function SetMat() {
     }
     layer1.k = newMat.k;
 }
-
+//this fucntion opens the material create input box
 function AddNewMat(name) {
     openDia();
 }
-
+/*it is also used to creat new material
+ *the newly created material will be add to the matList object
+ */
 function creatNewMat() {
     let select = document.getElementById('selector');
     let option = document.createElement('option');
@@ -280,16 +334,19 @@ function creatNewMat() {
     }
     closeDia();
 }
-
+/*check if the input is valid
+ *name.value maybe not necessar because the input value will be string
+ */
 function createCheck(name, num) {
     if ((typeof name.value === 'string') && (NumberCheck(Number(num.value)))) {
         return true;
     } else {
-        console.log(typeof name.value)
         return false;
     }
 }
-
+/*this function will create the mateial list.
+ *create the selection meun based on the element have in matList
+ */
 function createSelectList() {
     for (let i = 0; i < matList.Material.length; i++) {
         let select = document.getElementById('selector');
@@ -298,7 +355,12 @@ function createSelectList() {
         select.add(option);
     }
 }
-
+/*this function change the fill color of canvas in html
+ *`${}`is useful when combine string and variable
+ *when temp is above 0, if will choose a warm tone, when below 0, will choose a cool tone
+ *the color change will work in 100 to -100
+ *default value is white
+ */
 function fillCanvas(temp, cavs) {
     if (temp > 0) {
         let colorg = map(temp, 0, 100, 170, 70);
@@ -314,7 +376,7 @@ function fillCanvas(temp, cavs) {
         cavs.css("background-color", `rgb(255,255,255)`);
     }
 }
-
+//show the heat transform direction arrow based on the heat transform direction
 function showTransformArrow(media1, media2) {
     if (media1.temperature > media2.temperature && !stop) {
         lrArrow.show();
@@ -326,8 +388,4 @@ function showTransformArrow(media1, media2) {
         lrArrow.hide();
         rlArrow.hide();
     }
-}
-
-function getData() {
-
 }
